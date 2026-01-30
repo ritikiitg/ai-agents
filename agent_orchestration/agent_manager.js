@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import { Agent, run, tool } from "@openai/agents"; 
 import { z } from "zod";
+import readline from 'readline';
 
 
 const fetchAvailablePlans = tool({
@@ -79,4 +80,45 @@ async function runAgent(userQuery) {
 
 //runAgent('Tell me all the available internet plans you have.')
 
-runAgent('I need a refund, I am not happy with my internet speed. my customer ID is CUST123 and I am subscribed to plan ID 2. Please process my refund.')
+// runAgent('I need a refund, I am not happy with my internet speed. my customer ID is CUST123 and I am subscribed to plan ID 2. Please process my refund.')
+
+
+// Create readline interface for user input
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
+
+// Function to get user input from console
+function getUserInput(prompt) {
+    return new Promise((resolve) => {
+        rl.question(prompt, (answer) => {
+            resolve(answer);
+        });
+    });
+}
+
+async function main() {
+    console.log('Welcome to the Internet Service Provider Agent!');
+    console.log('Type your question or type "exit" to quit.\n');
+    
+    while(true){
+        const userQuery = await getUserInput('You: ');
+        
+        if (userQuery.toLowerCase() === 'exit') {
+            console.log('Goodbye!');
+            rl.close();
+            break;
+        }
+        
+        if (!userQuery.trim()) {
+            console.log('Please enter a valid question.\n');
+            continue;
+        }
+        
+        await runAgent(userQuery);
+        console.log('\n');
+    }
+}
+
+main();
